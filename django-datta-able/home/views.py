@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pandas as pd
+from .forms import FileUploadForm
 
 
 def index(request):
@@ -215,8 +216,6 @@ def delete_class(request):
             resp['msg'] = 'Class Detail has failed to delete.'
 
     return HttpResponse(json.dumps(resp),content_type="application/json")
-
-
 
 #Subject
 @login_required
@@ -595,43 +594,7 @@ def physics_form(request):
 
         return HttpResponse("Invalid request method")
 
-# @csrf_protect
-# def physics_form(request):
-#     if request.method == 'POST':
-#         form = MarksForm(request.POST, subjects=Subject.objects.values_list('name', flat=True))
-#         if form.is_valid():
-#             student_name = form.cleaned_data['student_name']
-#             subjects = form.cleaned_data['subjects']
-#             for subject in subjects:
-#                 c1 = form.cleaned_data.get('c1', None)
-#                 c2 = form.cleaned_data.get('c2', None)
-#                 c3 = form.cleaned_data.get('c3', None)
-#                 c4 = form.cleaned_data.get('c4', None)
-#                 final = form.cleaned_data.get('final', None)
-                
-#                 student_instance, created = Student.objects.get_or_create(name=student_name)
-#                 subject_instance, created = Subject.objects.get_or_create(name=subject)
 
-#                 subject_detail, created = SubjectDetail.objects.get_or_create(
-#                     student=student_instance,
-#                     subject=subject_instance,
-#                     defaults={'c1': c1, 'c2': c2, 'c3': c3, 'c4': c4, 'final': final}
-#                 )
-
-#                 if not created:
-#                     subject_detail.c1 = c1
-#                     subject_detail.c2 = c2
-#                     subject_detail.c3 = c3
-#                     subject_detail.c4 = c4
-#                     subject_detail.final = final
-#                     subject_detail.save()
-
-#             messages.success(request, "Student records created/updated successfully")
-#             return redirect('student_mgt')
-#     else:
-#         form = MarksForm(subjects=Subject.objects.values_list('name', flat=True))
-    
-#     return render(request, 'student_mgt.html', {'form': form})
 
 def copy_sheet_to_desktop(request):
     # Path to the pre-designed spreadsheet in the root directory of the app
@@ -999,4 +962,37 @@ def student_record(request):
 
     return redirect('student_mgt')
 
-# student_record()
+@csrf_protect
+def upload_file(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        uploaded_file = request.FILES['file']
+        if uploaded_file:
+            upload_folder = 'uploads'
+            
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            
+            for filename in os.listdir(upload_folder):
+                    file_path = os.path.join(upload_folder, filename)
+                    try:
+                        if os.path.isfile(file_path):
+                            os.unlink(file_path)
+                    except Exception as e:
+                        print(e)
+            upload_path = os.path.join(upload_folder, uploaded_file.name)
+            
+            with open(upload_path, 'wb') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
+            messages.success(request, "File uploaded successfully.")
+            return redirect('upload_success')
+        else:
+            messages.error(request, "No file was uploaded.")
+    
+    return render(request, 'includes/navigation.html')
+
+
+
+def upload_success(request):
+    return render(request, 'pages/index.html')

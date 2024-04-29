@@ -1,46 +1,101 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
 {% block content %}
 
   <!-- [ Main Content ] start -->
-  <div class="row">
-    <!-- [ badge ] start -->
-    <div class="col-sm-12">
+  <form action="" method="post" name="student_data">
+    {% csrf_token %}
+  <div class="col">
+    <div class="col-sm-8">
       <div class="card">
         <div class="card-header">
-          <h5>Basic Badges</h5>
+          <h5>Register Student</h5>
         </div>
-        <div class="card-body">
-          <h1>Example heading <span class="badge badge-secondary">New</span></h1>
-          <h2>Example heading <span class="badge badge-secondary">New</span></h2>
-          <h3>Example heading <span class="badge badge-secondary">New</span></h3>
-          <h4>Example heading <span class="badge badge-secondary">New</span></h4>
-          <h5>Example heading <span class="badge badge-secondary">New</span></h5>
-          <h6>Example heading <span class="badge badge-secondary">New</span></h6>
+        <div class="card-block">
+          <div class="row">
+            
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="fn">First Name</label>
+                <input type="text" class="form-control" id="first name" aria-describedby="firtst name"
+                  placeholder="Enter First Name" required>
+              </div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="ln">Last Name</label>
+                <input type="text" class="form-control" id="last name" aria-describedby="last name"
+                  placeholder="Enter Last Name" required>
+              </div>
+            </div>
+
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="fn">Other Name</label>
+                <input type="email" class="form-control" id="other name" aria-describedby="other name"
+                  placeholder="Enter Other Name">
+              </div>
+            </div>
+            
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="ln">LIN Number</label>
+                <input type="text" class="form-control" id="ln" aria-describedby="lin number"
+                  placeholder="Enter Lin Number" maxlength="20">
+              </div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="class">Class</label>
+                <input type="email" class="form-control" id="class" aria-describedby="class"
+                  placeholder="Enter Class" required>
+              </div>
+            </div>
+
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="stream">Stream</label>
+                <input type="email" class="form-control" id="stream" aria-describedby="stream"
+                  placeholder="Enter Stream" maxlength="1">
+              </div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="sex">Sex</label>
+                <input type="email" class="form-control" id="ln" aria-describedby="emailHelp"
+                  placeholder="Enter email">
+              </div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <label for="age">Age</label>
+                <input type="email" class="form-control" id="age" aria-describedby="age"
+                  placeholder="Enter Age" required>
+              </div>
+            </div>
+            <!--  -->
+           
+
+            <div class="col-sm-6 mb-4">
+              <div class="form-group">
+                <button type="submit" class="btn btn-outline-success">Submit Data</button>
+              </div>
+            </div>
+            
+          </div>
+          
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <h5>Button Badges</h5>
-        </div>
-        <div class="card-body">
-          <button type="button" class="btn btn-primary">primary <span
-              class="badge badge-light">4</span></button>
-          <button type="button" class="btn btn-secondary">secondary <span
-              class="badge badge-light">4</span></button>
-          <button type="button" class="btn btn-success">success <span
-              class="badge badge-light">4</span></button>
-          <button type="button" class="btn btn-danger">danger <span
-              class="badge badge-light">4</span></button>
-          <button type="button" class="btn btn-warning">warning <span
-              class="badge badge-light">4</span></button>
-          <button type="button" class="btn btn-info">info <span class="badge badge-light">4</span></button>
-        </div>
-      </div>
+      
+     
     </div>
-    <!-- [ badge ] end -->
+    
   </div>
+ 
+</form>
   <!-- [ Main Content ] end -->
 
-{% endblock content %}
+ {% endblock content %}

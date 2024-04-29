@@ -3,6 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import upload_file, upload_success
 
 from . import views
 # # import debug_toolbar
@@ -82,7 +83,8 @@ urlpatterns = [
     path('excell_to_db_var', views.excell_to_db_var, name='excell_to_db_var'),
     path('combine_records', views.combine_records, name='combine_records'),
     path('student_record', views.student_record, name='student_record'),
-    
+    path('upload/', upload_file, name='upload_file'),
+    path('upload/success/', upload_success, name='upload_success'),
     
     # path("__debug__/", include("debug_toolbar.urls")),
 ]
