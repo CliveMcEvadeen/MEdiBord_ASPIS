@@ -81,6 +81,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "core.urls"
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 HOME_TEMPLATES      = os.path.join(BASE_DIR, 'templates') 
 TEMPLATE_DIR_DATATB = os.path.join(BASE_DIR, "django_dyn_dt/templates") # <-- NEW: Dynamic_DT
 

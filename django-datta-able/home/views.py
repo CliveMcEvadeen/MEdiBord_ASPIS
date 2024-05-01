@@ -690,60 +690,8 @@ def all_fields_filled_checker(request,subject_id, student_id):
     return HttpResponse(all_fields_filled)
 
 # ---------------------------graph...................................#
-def create_bar_chart(categories, values):
-    plt.figure(figsize=(4.2, 2))
-    # plt.bar(categories, values, width=0.8)
-    # plt.bar(categories, values, width=0.8)
-    # plt.pie(values, labels=categories, autopct='%1.1f%%', startangle=140)
-    plt.hist(categories, bins=10, edgecolor='black') 
-    plt.xlabel('Categories')
-    plt.ylabel('Values')
-    plt.title('Bar Chart')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
 #
 
-def generate_chart_image(subjects, counts, colors, bar_width, space_width, image_path):
-    # Use a headless backend
-    performance_ranges = ["High", "Average", "Low"]
-    # BACK SWASH
-    plt.switch_backend('Agg')
-
-    # Ensure data consistency
-    if len(subjects) != len(counts):
-        raise ValueError("Number of subjects must match the number of count lists.")
-    if not all(len(sublist) == len(counts[0]) for sublist in counts):
-        raise ValueError("All count lists must have the same number of elements.")
-
-    # Create the stacked bar chart
-    plt.figure(figsize=(4.2, 3))
-    x = range(len(subjects))  # Positions for each subject bar
-
-    for i, performance_range in enumerate(performance_ranges):
-        plt.bar([x[j] + j * (bar_width + space_width) for j in range(len(subjects))], counts[i], bar_width, label=performance_range, color=colors[i])
-
-    plt.xlabel("Subjects")
-    plt.ylabel("Number of Students")
-    plt.title("Student Performance by Subject")
-    plt.xticks([x[i] + bar_width * 0.5 + i * (bar_width + space_width) for i in range(len(subjects))], subjects)
-    plt.legend()
-
-    # Annotate values above each segment
-    for i, subject in enumerate(subjects):
-        for j, count in enumerate(counts[i]):
-            plt.text(x[i] + bar_width * (j + 0.5) + i * (bar_width + space_width), count + 0.2, count, ha="center", va="bottom")
-
-    # Improve presentation with grid and minor ticks
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.minorticks_on()
-
-    plt.tight_layout()
-    plt.savefig(image_path)
-    plt.close()
-
-
-def generate_bar_chart_image(request):
     # Retrieve data dynamically (adjust based on your data source)
     subjects = ["Math", "Science", "English", "History"]  # Example with more subjects
     performance_ranges = ["High", "Average", "Low"]
@@ -996,3 +944,43 @@ def upload_file(request):
 
 def upload_success(request):
     return render(request, 'pages/index.html')
+
+@csrf_protect
+def add_student(request):
+    pass
+
+def edit_student(request):
+    pass
+
+def delete_student(request):
+    pass
+
+def view_student(request):
+    pass
+
+def add_stubject(request):
+    pass
+
+def edit_subjects(request):
+    pass
+
+def delete_subject(request):
+    pass
+
+def view_subjects(request):
+    pass
+
+def total_number_of_students(request):
+    pass
+
+def total_number_of_subjects(requests):
+    pass
+def student_performance(request):
+    pass
+
+def students_summery(request):
+    pass
+
+def generate_reportcards(request):
+    pass
+

@@ -65,7 +65,7 @@
 
     <form action="{% url 'upload_file' %}" enctype="multipart/form-data" method="post">
       {% csrf_token %}
-      {{ form }}
+      <!-- {{ form }} -->
       <button data-backdrop="false" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenter">
           Import Sheet
       </button>
