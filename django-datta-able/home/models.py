@@ -1,6 +1,6 @@
 from django.db import models
 from unittest import result
-# from django.db import models
+# from django.db import models 
 from django.db.models import Sum
 from django.utils import timezone
 # from 
@@ -39,6 +39,7 @@ class Subject(models.Model):
 
 
 class Student(models.Model):
+    
     classI = models.ForeignKey(Class, on_delete= models.CASCADE)
     student_id = models.CharField(max_length=16)
     first_name = models.CharField(max_length=250)
