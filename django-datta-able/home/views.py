@@ -35,7 +35,7 @@ from .forms import FileUploadForm
 import os
 import random
 from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, PatternFill
+from openpyxl.styles import Font, Alignment, PatternFill,Border,Side
 
 
 def index(request):
@@ -621,7 +621,7 @@ def copy_sheet_to_desktop(request):
 
     # Define title for the sheet
     title = "Student Marks Report"
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=42)  # Merge cells from A1 to AN1
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=44)  # Merge cells from A1 to AR1
     title_cell = ws.cell(row=1, column=1)
     title_cell.value = title
     title_cell.font = Font(size=14, bold=True)
@@ -630,8 +630,8 @@ def copy_sheet_to_desktop(request):
     # Define headers for student information
     ws.cell(row=3, column=1).value = "NAME"
     ws.cell(row=3, column=2).value = "LIN"
-    # ws.cell(row=3, column=3).value = "STREAM"
-    # ws.cell(row=3, column=4).value = "SEX"
+    ws.cell(row=3, column=3).value = "STREAM"
+    ws.cell(row=3, column=4).value = "SEX"
 
     header_font = Font(bold=True)
     header_align = Alignment(horizontal='center', vertical='center')
@@ -642,7 +642,7 @@ def copy_sheet_to_desktop(request):
 
     for i in range(1, 11):
         subject_name = f"Subject {i}"
-        start_col = 3 + (i - 1) * 4
+        start_col = 5 + (i - 1) * 4
         end_col = start_col + 3
         
         # Set alternating colors for subjects
@@ -665,13 +665,21 @@ def copy_sheet_to_desktop(request):
             ws.cell(row=3, column=col).fill = header_fill
             ws.cell(row=3, column=col).font = header_font
 
+    # Add borders to all cells in the sheet
+    thin_border = Border(left=Side(style='thin'), 
+                         right=Side(style='thin'), 
+                         top=Side(style='thin'), 
+                         bottom=Side(style='thin'))
+                         
+    for row in ws.iter_rows(min_row=1, max_row=3, min_col=1, max_col=44):
+        for cell in row:
+            cell.border = thin_border
+
     # Save the workbook as a spreadsheet file
     wb.save(file_path)
-    messages.success(request,"create successfully")
+    messages.success(request, "Created successfully")
 
-    return redirect(
-        'index'
-    )
+    return redirect('index')
 
     # messages.success(f"Spreadsheet created successfully and saved to desktop")
 
