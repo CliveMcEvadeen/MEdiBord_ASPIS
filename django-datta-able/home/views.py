@@ -32,6 +32,10 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pandas as pd
 from .forms import FileUploadForm
+import os
+import random
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
 
 
 def index(request):
@@ -597,39 +601,80 @@ def physics_form(request):
 
 
 def copy_sheet_to_desktop(request):
-    # Path to the pre-designed spreadsheet in the root directory of the app
-    sheet_path = os.path.join(settings.BASE_DIR, 'CARD.xlsx')
-    # Path to the desktop
-    desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-    # Path to the data_sheets folder on the desktop
-    data_sheets_folder = os.path.join(desktop_path, 'data_sheets')
 
-    try:
-        # Check if the data_sheets folder exists, if not, create it
-        if not os.path.exists(data_sheets_folder):
-            os.makedirs(data_sheets_folder)
+    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+    folder_name = "datasheets"
+    folder_path = os.path.join(desktop_path, folder_name)
+    
+    # Create the folder if it doesn't exist
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
-        # Generate a unique code
-        unique_code = str(uuid.uuid4())[:8]
-        numeric_code = int(unique_code, 16)
+    # Generate a random number for the filename
+    random_number = random.randint(1000, 9999)
+    file_name = f"datasheet_{random_number}.xlsx"
+    file_path = os.path.join(folder_path, file_name)
 
-        new_file_name = f'STUDENT_DATA_SHEET_{numeric_code}.xlsx'
+    # Create a new workbook
+    wb = Workbook()
+    ws = wb.active  # Get the active worksheet
 
-        # Copy the file to the data_sheets folder with the new name
-        new_file_path = os.path.join(data_sheets_folder, new_file_name)
-        shutil.copy(sheet_path, new_file_path)
+    # Define title for the sheet
+    title = "Student Marks Report"
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=42)  # Merge cells from A1 to AN1
+    title_cell = ws.cell(row=1, column=1)
+    title_cell.value = title
+    title_cell.font = Font(size=14, bold=True)
+    title_cell.alignment = Alignment(horizontal='center', vertical='center')
 
-        # return JsonResponse({'success': True, 'message': f"Spreadsheet copied to 'data_sheets' folder on desktop successfully with name: {new_file_name}"})
-        messages.success(request, f"Spreadsheet copied to 'data_sheets' folder on desktop successfully with name: {new_file_name}")
+    # Define headers for student information
+    ws.cell(row=3, column=1).value = "NAME"
+    ws.cell(row=3, column=2).value = "LIN"
+    # ws.cell(row=3, column=3).value = "STREAM"
+    # ws.cell(row=3, column=4).value = "SEX"
+
+    header_font = Font(bold=True)
+    header_align = Alignment(horizontal='center', vertical='center')
+    data_align = Alignment(horizontal='center', vertical='center')
+
+    # Define colors for subjects
+    colors = ['FFC000', '00B0F0']
+
+    for i in range(1, 11):
+        subject_name = f"Subject {i}"
+        start_col = 3 + (i - 1) * 4
+        end_col = start_col + 3
         
-    except FileNotFoundError:
-        # return JsonResponse({'success': False, 'message': "Error: File not found"})
-        messages.error(request,"Error: File not found")
-    except Exception as e:
-        # return JsonResponse({'success': False, 'message': f"Error: {str(e)}"})
-        messages.error(request, f"Error: {str(e)}")
+        # Set alternating colors for subjects
+        header_fill = PatternFill(start_color=colors[i % 2], end_color=colors[i % 2], fill_type='solid')
+        
+        # Merge cells for subject name and set styles
+        ws.cell(row=2, column=start_col).value = subject_name
+        ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=end_col)
+        ws.cell(row=2, column=start_col).alignment = header_align
+        ws.cell(row=2, column=start_col).fill = header_fill
+        ws.cell(row=2, column=start_col).font = header_font
 
-    return HttpResponseRedirect(reverse('index'))
+        # Set headers for each component of the subject
+        ws.cell(row=3, column=start_col).value = "C1"
+        ws.cell(row=3, column=start_col + 1).value = "C2"
+        ws.cell(row=3, column=start_col + 2).value = "C3"
+        ws.cell(row=3, column=start_col + 3).value = "FS"
+        for col in range(start_col, end_col + 1):
+            ws.cell(row=3, column=col).alignment = header_align
+            ws.cell(row=3, column=col).fill = header_fill
+            ws.cell(row=3, column=col).font = header_font
+
+    # Save the workbook as a spreadsheet file
+    wb.save(file_path)
+    messages.success(request,"create successfully")
+
+    return redirect(
+        'index'
+    )
+
+    # messages.success(f"Spreadsheet created successfully and saved to desktop")
+
 
 def filter_students(request):
     # if request.method == 'POST':
