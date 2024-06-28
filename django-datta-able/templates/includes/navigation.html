@@ -60,6 +60,15 @@
         data-toggle="tooltip">Generate Reportcard</button>
         </form>
     </div>
+    <div>
+        <form action="{% url 'write_to_db' %}" method="post">
+          {% csrf_token %}
+          <!-- <button type="submit" class="btn btn-primary rounded-0 bg-gradient btn-sm" id="generate_sheet_btn"><i class="fa-8x fa fa-file-excel-o" style="margin-right: 5px; margin-left: 1px; font-size: 15px;"><i></i></i>Generate Sheet</button> -->
+        <!-- <button type="button" class="btn btn-square btn-success" id="generate_sheet_btn">Success</button> -->
+        <button type="submit" class="btn btn-outline-primary" title="btn btn-outline-primary"
+        data-toggle="tooltip">Populate Db</button>
+        </form>
+    </div>
 
     <!-- ........................ -->
 

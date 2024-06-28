@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from home import forms, models
-from .models import SubjectDetail, Subject, Student,Class
+from .models import *
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_protect
 import shutil
@@ -26,7 +26,6 @@ from django.http import JsonResponse
 from django.urls import reverse
 import pdb
 import os
-from django.conf import settings
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -627,18 +626,22 @@ def copy_sheet_to_desktop(request):
     title_cell.font = Font(size=14, bold=True)
     title_cell.alignment = Alignment(horizontal='center', vertical='center')
 
-    # Define headers for student information
-    ws.cell(row=3, column=1).value = "NAME"
-    ws.cell(row=3, column=2).value = "LIN"
-    ws.cell(row=3, column=3).value = "STREAM"
-    ws.cell(row=3, column=4).value = "SEX"
-
     header_font = Font(bold=True)
     header_align = Alignment(horizontal='center', vertical='center')
     data_align = Alignment(horizontal='center', vertical='center')
 
     # Define colors for subjects
     colors = ['FFC000', '00B0F0']
+
+    # Define headers for student information
+    ws.cell(row=2, column=1).value = "NAME"
+    ws.cell(row=2, column=2).value = "LIN"
+    ws.cell(row=2, column=3).value = "STREAM"
+    ws.cell(row=2, column=4).value = "SEX"
+    for col in range(1, 5):
+        ws.cell(row=2, column=col).alignment = header_align
+        ws.cell(row=2, column=col).font = header_font
+        ws.cell(row=2, column=col).fill = PatternFill(start_color=colors[0], end_color=colors[0], fill_type='solid')
 
     for i in range(1, 11):
         subject_name = f"Subject {i}"
@@ -768,22 +771,32 @@ def all_fields_filled_checker(request,subject_id, student_id):
         # Handle errors gracefully, send appropriate response or error message
         return HttpResponse("Error generating chart: {}".format(e), status=500)
 
+"""
+
+start-uploads data from the sheet
+student activities=> c1,c2,c3 and c4
+filterling and insert data into the database
+
+"""
 def get_records():
     try:
         uploads_folder = os.path.join(settings.BASE_DIR, 'uploads')
         
-         # Construct the absolute path to the file
+        # Construct the absolute path to the file
         file_path = os.path.join(uploads_folder, 'card.xlsx')
-        # Read data from the Excel file
-        df = pd.read_excel(file_path, sheet_name='ACTIVITIES', skiprows=1)
+        
+        # Read data from the Excel file, skipping the first row for headers
+        df = pd.read_excel(file_path, sheet_name='Sheet', skiprows=1)
         
         # Filter out columns with all NaN values
         df_filtered = df.dropna(axis=1, how='all')
-        df_filtered = df_filtered.iloc[2:]
+
+        # Further skip the first two rows of data (originally the first three lines)
+        df_filtered = df_filtered.iloc[1:]
 
         subjects = df.iloc[1]
         # Dropping the first four columns
-        column_drop = subjects[4:]
+        column_drop = subjects[3:]
 
         # Dropping subjects with unnamed head labels
         subject_modified = column_drop.filter(regex=r'^(?!Unnamed)')
@@ -792,17 +805,21 @@ def get_records():
         # List to store records
         records = []
 
+        print(f"Total rows to process: {len(df_filtered)}")  # Debugging output
+
         # Iterate through DataFrame rows 
         for index, row in df_filtered.iterrows():
+            print(f"Processing row {index + 1}: {row}")  # Debugging output
+
             # Extract data from the row
             name = row['NAME']
             lin = row['LIN']
-            stream = row['STREAM'] 
+            stream = row['STREAM']
             sex = row['SEX']
-            
+
             # Dictionary to store student data
             student_data = {'name': name, 'lin': lin, 'stream': stream, 'sex': sex, 'subjects': {}}
-            
+
             # Iterate through subjects
             for subject in subject_modified.index:
                 subject_data = {}
@@ -823,10 +840,10 @@ def get_records():
 
                 # Add subject data to the student's subjects dictionary
                 student_data['subjects'][subject] = subject_data
-            
+
             # Append student's data to the records list
             records.append(student_data)
-            
+
         return records
 
     except FileNotFoundError:
@@ -910,58 +927,139 @@ def combine_records(records):
 
     return list(combined_records.values())
 
-# Example usage:
+
 def student_record(request):
+    try:
+        records = excell_to_db_var()  # Returns raw records from Excel
+        combined_records = combine_records(records)  # Combines records into desired format
 
-    records = excell_to_db_var()
-    combined_records = combine_records(records)
+        formatted_records = []
+        
+        for record in combined_records:
+            name = record['name']
+            lin = record['lin']
+            gender = record['gender']
+            stream = record['stream']
 
-    for record in combined_records:
-        student_name=record['name']
-        lin=record['lin']
-        gender=record['gender']
-        stream=record['stream']
-        for subject, activities in record['subjects_data'].items():
-            subject_name=subject
-            c1=float(activities['c1'])
-            c2=float(activities['c2'])
-            c3=float(activities['c3'])
-            c4=float(activities['c4'])
+            subjects_data = {}
+            for subject, activities in record['subjects_data'].items():
+                subjects_data[subject] = {
+                    'c1': activities['c1'],
+                    'c2': activities['c2'],
+                    'c3': activities['c3'],
+                    'c4': activities['c4']
+                }
 
+            formatted_record = {
+                'name': name,
+                'lin': lin,
+                'gender': gender,
+                'stream': stream,
+                'subjects_data': subjects_data
+            }
+
+            formatted_records.append(formatted_record)
+
+        return formatted_records
+
+    except Exception as e:
+        print(f"An error occurred while formatting records: {str(e)}")
+        return []
+
+
+"""write to db"""
+
+def write_to_db(request):
+    try:
+        combined_records = student_record(request)
+    except Exception as e:
+        print(f"Error getting student records: {str(e)}")
+        return JsonResponse({'error': 'Failed to get student records', 'message': str(e)}, status=500)
+
+    if not combined_records:
+        print("No records found.")
+        return JsonResponse({'message': 'No records found.'}, status=200)
+
+    print(f"Total records to process: {len(combined_records)}")  # Debugging output
+
+    for idx, record in enumerate(combined_records):
         try:
-                student_instance = Student.objects.get(name=student_name)
-        except Student.DoesNotExist:
-                messages.error(request, "Student does not exist")
-                # return HttpResponse("Student does not exist")
+            print(f"Processing record {idx + 1}/{len(combined_records)}: {record}")  # Debugging output
 
-            # Validate if subject exists
-        try:
-            subject_instance = Subject.objects.get(name=subject_name)
-        except Subject.DoesNotExist:
-            messages.error(request, "Subject does not exist")
-            # return HttpResponse("Subject does not exist")
+            lin = int(float(record['lin']))  # Convert lin to float first, then to integer
+            print("LIN:", lin)
 
-        # Process form data and save it
-        subject_detail, created = SubjectDetail.objects.get_or_create(
-            student=student_instance,
-            subject=subject_instance,
-            # defaults={'c1': c1, 'c2': c2, 'c3': c3, 'c4': c4, 'final': final}
-            defaults={'c1': c1, 'c2': c2, 'c3': c3, 'c4': c4}
-        )
+            # Ensure 'defaults' does not overwrite existing students
+            student, created = Student.objects.get_or_create(
+                lin=lin,
+                defaults={
+                    'name': record['name'],
+                    'gender': record['gender'],
+                    'stream': record['stream']
+                }
+            )
+            print(f"Student: {student}, Created: {created}")
 
-        messages.success(request,"Student records created successfully")
-        if not created:
-            # Update the existing record
-            subject_detail.c1 = c1
-            subject_detail.c2 = c2
-            subject_detail.c3 = c3
-            subject_detail.c4 = c4
-            # subject_detail.final = final
-            subject_detail.save()
+            # Update existing student details if not created new
+            if not created:
+                student.name = record['name']
+                student.gender = record['gender']
+                student.stream = record['stream']
+                student.save()
 
-            messages.success(request,"Student records updated successfully")
+            for subject_name, activities in record['subjects_data'].items():
+                print("Processing subject:", subject_name)  # Debugging output
+                subject, created = Subject.objects.get_or_create(name=subject_name)
+                print(f"Subject: {subject}, Created: {created}")
 
-    return redirect('student_mgt')
+                student_subject, created = StudentSubject.objects.get_or_create(
+                    student=student,
+                    subject=subject,
+                    defaults={
+                        'c1': activities['c1'],
+                        'c2': activities['c2'],
+                        'c3': activities['c3'],
+                        'fs': activities['c4']
+                    }
+                )
+                print(f"StudentSubject: {student_subject}, Created: {created}")
+
+                # Update existing student_subject details if not created new
+                if not created:
+                    student_subject.c1 = activities['c1']
+                    student_subject.c2 = activities['c2']
+                    student_subject.c3 = activities['c3']
+                    student_subject.fs = activities['c4']
+                    student_subject.save()
+
+                for idx, activity in enumerate([activities['c1'], activities['c2'], activities['c3'], activities['c4']], start=1):
+                    print(f"Processing activity c{idx}: {activity}")  # Debugging output
+                    mark, created = Marks.objects.get_or_create(
+                        student_subject=student_subject,
+                        component_name=f'c{idx}',
+                        defaults={'marks': activity}
+                    )
+                    print(f"Mark: {mark}, Created: {created}")
+
+                    # Update existing marks details if not created new
+                    if not created:
+                        mark.marks = activity
+                        mark.save()
+
+        except Exception as e:
+            print(f"Error processing record {idx + 1}/{len(combined_records)}: {record}, Error: {str(e)}")  # Debugging output
+            continue  # Skip this record and move to the next
+
+    print("Data successfully written to the database.")
+    print(student_record(request))
+    print("test records: ",get_records())
+    return JsonResponse({'message': 'Data successfully written to the database.'}, status=200)
+# Call the new function to write the data to the database
+# write_to_db()
+# # Optionally, call student_record to print the data
+# print(student_record())
+# Call the new function to write the data to the database
+# write_to_db()
 
 @csrf_protect
 def upload_file(request):
@@ -993,6 +1091,7 @@ def upload_file(request):
             return redirect('upload_success')
         else:
             messages.error(request, "No file was uploaded.")
+            
     
     return render(request, 'includes/navigation.html')
 
@@ -1000,43 +1099,4 @@ def upload_file(request):
 
 def upload_success(request):
     return render(request, 'pages/index.html')
-
-@csrf_protect
-def add_student(request):
-    pass
-
-def edit_student(request):
-    pass
-
-def delete_student(request):
-    pass
-
-def view_student(request):
-    pass
-
-def add_stubject(request):
-    pass
-
-def edit_subjects(request):
-    pass
-
-def delete_subject(request):
-    pass
-
-def view_subjects(request):
-    pass
-
-def total_number_of_students(request):
-    pass
-
-def total_number_of_subjects(requests):
-    pass
-def student_performance(request):
-    pass
-
-def students_summery(request):
-    pass
-
-def generate_reportcards(request):
-    pass
 

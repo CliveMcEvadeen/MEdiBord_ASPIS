@@ -3,6 +3,11 @@
 
 {% block breadcrumbs %}{% endblock breadcrumbs %}
 
+{% block extrastyle %}
+  <!-- morris css -->
+  <link rel="stylesheet" href="{% static 'assets/plugins/chart-morris/css/morris.css' %}">
+{% endblock extrastyle %}
+
 {% block content %}
 
   <!-- [ Main Content ] start -->
@@ -20,7 +25,7 @@
             </div>
 
             <div class="col-3 text-right">
-              <p class="m-b-0">67%</p>
+              <p class="m-b-0">67</p>
             </div>
           </div>
           <div class="progress m-t-30" style="height: 7px;">
@@ -43,7 +48,7 @@
                 46</h3>
             </div>
             <div class="col-3 text-right">
-              <p class="m-b-0">36%</p>
+              <p class="m-b-0">36</p>
             </div>
           </div>
           <div class="progress m-t-30" style="height: 7px;">
@@ -66,7 +71,7 @@
                 27</h3>
             </div>
             <div class="col-3 text-right">
-              <p class="m-b-0">80%</p>
+              <p class="m-b-0">80</p>
             </div>
           </div>
           <div class="progress m-t-30" style="height: 7px;">
@@ -79,7 +84,18 @@
     <!--[ year  sales section ] end-->
     <!--[ Recent Users ] start-->
     <div class="col-xl-8 col-md-6">
-      <div class="card Recent-Users">
+
+      <!-- <div class="col-xl-6"> -->
+        <div class="card">
+          <div class="card-header">
+            <h5>Performance Per Gender</h5>
+          </div>
+          <div class="card-block">
+            <div id="morris-bar-chart" style="height:350px"></div>
+          </div>
+        </div>
+      <!-- </div> -->
+      <!-- <div class="card Recent-Users">
 
         {% if products %}
 
@@ -219,7 +235,7 @@
         {% endif %}
 
 
-      </div>
+      </div>-->
     </div>
     <!--[ Recent Users ] end-->
 
@@ -232,10 +248,10 @@
               <h5 class="m-0">REPORT CARDS</h5>
             </div>
             <div class="col-auto">
-              <label class="label theme-bg2 text-white f-14 f-w-400 float-right">34%</label>
+              <label class="label theme-bg2 text-white f-14 f-w-400 float-right">34</label>
             </div>
           </div>
-          <h2 class="mt-3 f-w-300">45<sub class="text-muted f-14">Competitors</sub></h2>
+          <h2 class="mt-3 f-w-300">45<sub class="text-muted f-14">Reportcards</sub></h2>
           <h6 class="text-muted mt-4 mb-0">You can participate in event </h6>
           <i class="fab fa-angellist text-c-purple f-50"></i>
         </div>
@@ -276,7 +292,7 @@
             </div>
             <div class="col text-right">
               <h3>12,281</h3>
-              <h5 class="text-c-green mb-0">+7.2% <span class="text-muted">Total Likes</span></h5>
+              <h5 class="text-c-green mb-0">+7.2 <span class="text-muted">Total Likes</span></h5>
             </div>
           </div>
         </div>
@@ -309,7 +325,7 @@
             </div>
             <div class="col text-right">
               <h3>11,200</h3>
-              <h5 class="text-c-purple mb-0">+6.2% <span class="text-muted">Total Likes</span>
+              <h5 class="text-c-purple mb-0">+6.2 <span class="text-muted">Total Likes</span>
               </h5>
             </div>
           </div>
@@ -343,7 +359,7 @@
             </div>
             <div class="col text-right">
               <h3>10,500</h3>
-              <h5 class="text-c-blue mb-0">+5.9% <span class="text-muted">Total Likes</span></h5>
+              <h5 class="text-c-blue mb-0">+5.9 <span class="text-muted">Total Likes</span></h5>
             </div>
           </div>
         </div>
@@ -713,3 +729,12 @@
   <!-- [ Main Content ] end -->
 
 {% endblock content %}
+
+{% block extra_js %}
+
+  <!-- chart-morris Js -->
+  <script src="{% static 'assets/plugins/chart-morris/js/raphael.min.js' %}"></script>
+  <script src="{% static 'assets/plugins/chart-morris/js/morris.min.js' %}"></script>
+  <script src="{% static 'assets/js/pages/chart-morris-custom.js' %}"></script>
+
+{% endblock extra_js %}

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEVVERTEX High School</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        table, th, td {
+            padding: 0;
+            margin: 0;
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header {
+            text-align: center;
+            position: relative;
+        }
+        .header img {
+            padding-top: 0px;
+            margin-top: 0px;
+            width: 100px;
+            height: 100px;
+        }
+        .watermark {
+            position: absolute;
+            opacity: 0.1;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            width: 80%;
+            height: auto;
+        }
+        .description {
+            margin-top: 20px;
+        }
+        .student-details table, 
+        .student-details table th, 
+        .student-details table td {
+            border: 0;
+
+        }
+
+
+        .details-table  table, 
+        .details-table table th, 
+        .details-table table td {
+            border: 0;
+            /* border-bottom: 0px solid black; */
+        }
+        .info table, 
+        .info table th, 
+        .info table td {
+            border: 0;
+            border: 2px double green;
+            table-layout: fixed;
+            width: 100%;
+        }
+        .info table th,
+        .last table td {
+            border: 0;
+        }
+        .student-details-decoration {
+            width: 8px; 
+            border-bottom: 3px solid black;
+            /* padding-right: 50%; */
+            /* border-bottom: 2px solid black; */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DEVVERTEX
+        <img src="badge sample.png" alt="badge">HIGH SCHOOL</h1>
+    </div>
+    <img src="badge sample.png" alt="watermark" class="watermark">
+    
+    <div style="line-height: 3px; align-content: center;" class="info">
+        <table>
+            <tr style="font-weight: bold; font-size: 12px; text-align: center;">
+                <td style="text-align: center; padding-left: 0px; padding-right: 0px;">PO BOX 4556 KLA UG</td>
+                <td style="text-align: center; padding-left: 0px; padding-right: 0px;">+256 766524526</td>
+                <td style="text-align: center; padding-left: 0px; padding-right: 0px;">+256 788990099</td>
+                <td style="text-align: center; padding-left: 0px; padding-right: 0px; border-right: 0px;">Kikajjo</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding-bottom: 10px;"></div>
+    <div></div>
+    <div class="details-table">
+        <table style="font-weight: bolder; font-size: 13px;">
+            <tr>
+                <td style="width:2px;">NAME:</td>
+                <td style="width: 20px;"><span class="">Kakeeto Clive</span></td>
+
+                <div class="inner-cell">
+                    <td style="width: 10px;"></td>
+                </div>
+
+                <td style="width:2%;">LIN:</td>
+                <td style="width: 20px;"><span class="">1234567890</span></td>
+
+                <div class="inner-cell" style="border: 0px;">
+                    <td style="width: 10px;"></td>
+                </div>
+            </tr>
+            <tr>
+                <td style="width:2%;">Gender:</td>
+                <td style="width: 20px;"><span class="">Male</span></td>
+                <td style="width: 10px;"></td>
+                <td style="width:2%;">Class:</td>
+                <td style="width: 20px;"><span class="">S4</span></td>
+                <td style="width: 10px;"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="border-bottom: 5px double green; margin-top: 5px;"></div>
+
+    <h2 style="text-decoration: underline; text-align: center;">END OF TERM ASSESSMENT REPORT</h2>
+
+    <div style="border: 5px double green; padding: 10px; height: 100%;">
+        <table>
+            <tr>
+                <th rowspan="2">Learning Areas</th>
+                <th colspan="4"><center>AOI</center></th>
+                <th colspan="4"><center>Grades</center></th>
+                <th rowspan="2">Identifier</th>
+                <th rowspan="2">Achievement</th>
+                <th rowspan="2">Initials</th>
+            </tr>
+            <tr>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>Avg</th>
+                <th>20%</th>
+                <th>80%</th>
+                <th>100%</th>
+            </tr>
+            <tr>
+                <td>CHEMISTRY</td>
+                <td>0.1</td>
+                <td>0.2</td>
+                <td>0.3</td>
+                <td>0.4</td>
+                <td>avg</td>
+                <td>0.2</td>
+                <td>0.8</td>
+                <td>0.10</td>
+                <td>1</td>
+                <td>moderate</td>
+                <td>NM</td>
+            </tr>
+            <tr>
+                <td>English</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Mathematics</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>BIOLOGY</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>HISTORY</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>LITERATURE</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>ICT</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Music</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Art</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>P.E</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <div class="description">
+            <table>
+                <thead>
+                    <tr>
+                        <th>SCORE RANGE (%)</th>
+                        <th>GRADE</th>
+                        <th>RANGE (X/3)</th>
+                        <th>GRADE DESCRIPTOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0-29</td>
+                        <td>G</td>
+                        <td>0 - 0.8</td>
+                        <td>Very few or no competencies.</td>
+                    </tr>
+                    <tr>
+                        <td>30-39</td>
+                        <td>F</td>
+                        <td>0.9 - 1.1</td>
+                        <td>Some competencies but not enough for overall competence.</td>
+                    </tr>
+                    <tr>
+                        <td>40-49</td>
+                        <td>E</td>
+                        <td>1.2 - 1.4</td>
+                        <td>Bare minimum competencies.</td>
+                    </tr>
+                    <tr>
+                        <td>50-59</td>
+                        <td>D</td>
+                        <td>1.5 - 1.7</td>
+                        <td>Basic competencies.</td>
+                    </tr>
+                    <tr>
+                        <td>60-69</td>
+                        <td>C</td>
+                        <td>1.8 - 2.0</td>
+                        <td>Good number of competencies.</td>
+                    </tr>
+                    <tr>
+                        <td>70-79</td>
+                        <td>B</td>
+                        <td>2.1 - 2.3</td>
+                        <td>Most competencies well, very good in several areas.</td>
+                    </tr>
+                    <tr>
+                        <td>80-89</td>
+                        <td>A</td>
+                        <td>2.4 - 2.6</td>
+                        <td>Most or all competencies exceedingly well, excellent overall.</td>
+                    </tr>
+                    <tr>
+                        <td>90-100</td>
+                        <td>A*</td>
+                        <td>2.7 - 3.0</td>
+                        <td>All competencies exceptionally well, outstanding overall.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="font-family: Arial, Helvetica, sans-serif; padding-top: 0px;">
+                <h3>KEY TO TERMS USED </h3>
+                <table>
+                    <tr style="font-weight: bold;">
+                        <td>AOI-Activity of integration</td>
+                        <td>C1-AOI-1</td>
+                        <td>C2-AOI-2</td>
+                        <td>C3-AOI-3</td>
+                        <td>FS-Final Score</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="student-details" style="padding-top: 10px;">
+                <table>
+                    <tr>
+                        <td style="font-size: 13px; font-weight: bold;">HM Signature:.............................................................</td>   
+                        <td style="font-size: 13px; font-weight: bold;">DOS Signature:.................................................................</td>   
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import upload_file, upload_success
+from .views import upload_file, upload_success, write_to_db
 
 from . import views
 # # import debug_toolbar
@@ -74,10 +74,6 @@ urlpatterns = [
     path('filter-students/', views.filter_students, name='filter_students'),
     path('return_home/', views.return_home, name='return_home'),
     path('view_sheet/', views.view_sheet, name='view_sheet'),
-    # path("create_bar_chart/", views.create_bar_chart, name="create_bar_chart"),
-    # path("generate_chart_image/", views.generate_chart_image, name="generate_chart_image"),
-    # # path("generate_bar_chart_image/", views.generate_bar_chart_image, name="bar_chart_image"),
-    # path("generate_bar_chart_image/", views.generate_bar_chart_image, name="bar_chart_image"),
     path('all_fields_filled_checker/<int:subject_id>/<int:student_id>', views.all_fields_filled_checker, name='all_fields_filled_checker'),
     path('get_records', views.get_records, name='get_records'),
     path('excell_to_db_var', views.excell_to_db_var, name='excell_to_db_var'),
@@ -85,6 +81,7 @@ urlpatterns = [
     path('student_record', views.student_record, name='student_record'),
     path('upload/', upload_file, name='upload_file'),
     path('upload/success/', upload_success, name='upload_success'),
+    path('write-to-db', write_to_db, name='write_to_db')
     
     # path("__debug__/", include("debug_toolbar.urls")),
 ]
