@@ -131,6 +131,36 @@ class StudentSubject(models.Model):
     c2 = models.FloatField(null=True, blank=True)
     c3 = models.FloatField(null=True, blank=True)
     fs = models.FloatField(null=True, blank=True)
+    avg = models.FloatField(null=True, blank=True)
+    twenty_percent = models.FloatField(null=True, blank=True)
+    eighty_percent = models.FloatField(null=True, blank=True)
+    final_score = models.FloatField(null=True, blank=True)
+    identifier = models.CharField(max_length=10, null=True, blank=True)
+    achievement = models.CharField(max_length=50, null=True, blank=True)
+    initials = models.CharField(max_length=10, null=True, blank=True)
+
+    def calculate_avg(self):
+        self.avg = (self.c1 + self.c2 + self.c3 + self.fs) / 4
+        self.save()
+
+    def determine_identifier(self):
+        if 0 <= self.avg <= 0.8:
+            self.identifier = "G"
+        elif 0.9 <= self.avg <= 1.1:
+            self.identifier = "F"
+        elif 1.2 <= self.avg <= 1.4:
+            self.identifier = "E"
+        elif 1.5 <= self.avg <= 1.7:
+            self.identifier = "D"
+        elif 1.8 <= self.avg <= 2.0:
+            self.identifier = "C"
+        elif 2.1 <= self.avg <= 2.3:
+            self.identifier = "B"
+        elif 2.4 <= self.avg <= 2.6:
+            self.identifier = "A"
+        elif 2.7 <= self.avg <= 3.0:
+            self.identifier = "A*"
+        self.save()
 
     class Meta:
         unique_together = ('student', 'subject')
@@ -146,3 +176,13 @@ class Marks(models.Model):
     def __str__(self):
         return f"{self.student_subject.student.name} - {self.student_subject.subject.name} - {self.component_name}"
 
+class SchoolDetails(models.Model):
+    school_name = models.CharField(max_length=50)
+    school_contact1 = models.CharField(max_length=10)
+    school_contact2 = models.CharField(max_length=10)
+    school_contact3 = models.CharField(max_length=10, blank=True, null=True)
+    school_box_number = models.CharField(max_length=10)
+    school_badge = models.ImageField(upload_to='school_badges/')
+
+    def __str__(self):
+        return self.school_name

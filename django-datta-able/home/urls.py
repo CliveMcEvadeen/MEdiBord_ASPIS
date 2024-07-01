@@ -61,7 +61,7 @@ urlpatterns = [
     path("delete_result", views.delete_result,name="delete-result"),
     path("select_student", views.select_student,name="select-student"),
     path("list_result", views.list_student_result,name="list-result"),
-    path("create_subject_detail/", views.add_subject_detail, name="create_subject_detail"),
+    # path("create_subject_detail/", views.add_subject_detail, name="create_subject_detail"),
     path("list_result/<int:pk>", views.list_student_result),
     path("submission_form/", views.physics_form, name="physics_form"),
     path("subjects/", views.subjects, name="subjects"),
@@ -81,7 +81,9 @@ urlpatterns = [
     path('student_record', views.student_record, name='student_record'),
     path('upload/', upload_file, name='upload_file'),
     path('upload/success/', upload_success, name='upload_success'),
-    path('write-to-db', write_to_db, name='write_to_db')
+    path('write-to-db', write_to_db, name='write_to_db'),
+    path('school-details/', views.create_or_update_school_details, name='school_details'),
+    path('school-details-success/', views.school_details_success, name='school_details_success'),
     
     # path("__debug__/", include("debug_toolbar.urls")),
 ]

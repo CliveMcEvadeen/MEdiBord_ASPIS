@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from home import models
 from datetime import datetime
 from .models import *
+from .models import SchoolDetails
 
 class UpdateProfile(UserChangeForm):
     username = forms.CharField(max_length=250,help_text="The Username field is required.")
@@ -208,3 +209,17 @@ class UpdatePasswords(PasswordChangeForm):
 
 class FileUploadForm(forms.Form):
     file = forms.FileField()
+
+class SchoolDetailsForm(forms.ModelForm):
+    class Meta:
+        model = SchoolDetails
+        fields = ['school_name', 'school_contact1', 'school_contact2', 'school_box_number', 'school_badge']
+
+        widgets = {
+            'school_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'school_contact1': forms.TextInput(attrs={'class': 'form-control'}),
+            'school_contact2': forms.TextInput(attrs={'class': 'form-control'}),
+            'school_contact3': forms.TextInput(attrs={'class': 'form-control'}),
+            'school_box_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'school_badge': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+        }

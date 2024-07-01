@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pandas as pd
-from .forms import FileUploadForm
+from .forms import FileUploadForm, SchoolDetailsForm
 import os
 import random
 from openpyxl import Workbook
@@ -491,13 +491,13 @@ def list_student_result(request, pk=None):
 
     return render(request, 'list_results.html', context)
 
-def add_subject_detail(request, pk=None):
+# def add_subject_detail(request, pk=None):
 
-    report = SubjectDetail.objects.all()
-    if not report:
-        return render(request, 'record_not_found.html')
+#     report = SubjectDetail.objects.all()
+#     if not report:
+#         return render(request, 'record_not_found.html')
 
-    return render(request, 'add_subject_detail.html', {'reports': report})
+#     return render(request, 'add_subject_detail.html', {'reports': report})
 
 def subjects(request):
     subjects = Subject.objects.all()
@@ -1100,3 +1100,19 @@ def upload_file(request):
 def upload_success(request):
     return render(request, 'pages/index.html')
 
+def create_or_update_school_details(request):
+    if request.method == 'POST':
+        form = SchoolDetailsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('school_details_success')
+    else:
+        form = SchoolDetailsForm()
+    
+    return render(request, 'school_details_form.html', {'form': form})
+
+def school_details_success(request):
+    return render(request, 'school_details_success.html')
+
+def render_report_data(request):
+    pass
