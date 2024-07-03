@@ -1052,14 +1052,8 @@ def write_to_db(request):
 
     print("Data successfully written to the database.")
     print(student_record(request))
-    print("test records: ",get_records())
+    print("test records: ", get_records())
     return JsonResponse({'message': 'Data successfully written to the database.'}, status=200)
-# Call the new function to write the data to the database
-# write_to_db()
-# # Optionally, call student_record to print the data
-# print(student_record())
-# Call the new function to write the data to the database
-# write_to_db()
 
 @csrf_protect
 def upload_file(request):
