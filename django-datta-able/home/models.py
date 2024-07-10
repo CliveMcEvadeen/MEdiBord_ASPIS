@@ -160,6 +160,8 @@ class StudentSubject(models.Model):
             self.identifier = "A"
         elif 2.7 <= self.avg <= 3.0:
             self.identifier = "A*"
+        elif self.avg > 3.0:
+            self.identifier = "TF"
         self.save()
 
     class Meta:

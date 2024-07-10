@@ -125,6 +125,8 @@ if DB_ENGINE and DB_NAME and DB_USERNAME:
         'PASSWORD': DB_PASS,
         'HOST'    : DB_HOST,
         'PORT'    : DB_PORT,
+        'ATOMIC_REQUESTS': True,
+
         }, 
     }
 else:

@@ -35,7 +35,10 @@ import os
 import random
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill,Border,Side
+from django.db import transaction
+import logging
 
+logger = logging.getLogger(__name__)
 
 def index(request):
 
@@ -969,90 +972,113 @@ def student_record(request):
 
 """write to db"""
 
+
 def write_to_db(request):
     try:
         combined_records = student_record(request)
     except Exception as e:
-        print(f"Error getting student records: {str(e)}")
+        logger.error(f"Error getting student records: {str(e)}")
         return JsonResponse({'error': 'Failed to get student records', 'message': str(e)}, status=500)
 
     if not combined_records:
-        print("No records found.")
+        logger.info("No records found.")
         return JsonResponse({'message': 'No records found.'}, status=200)
 
-    print(f"Total records to process: {len(combined_records)}")  # Debugging output
+    logger.info(f"Total records to process: {len(combined_records)}")  # Debugging output
 
-    for idx, record in enumerate(combined_records):
-        try:
-            print(f"Processing record {idx + 1}/{len(combined_records)}: {record}")  # Debugging output
+    with transaction.atomic():
+        for idx, record in enumerate(combined_records):
+            try:
+                logger.debug(f"Processing record {idx + 1}/{len(combined_records)}: {record}")  # Debugging output
 
-            lin = int(float(record['lin']))  # Convert lin to float first, then to integer
-            print("LIN:", lin)
+                try:
+                    lin = int(float(record['lin']))  # Convert lin to float first, then to integer
+                    logger.debug("LIN: %s", lin)
+                except (ValueError, TypeError) as e:
+                    logger.error(f"Error converting LIN: {record['lin']}, Error: {str(e)}")
+                    continue  # Skip this record and move to the next
 
-            # Ensure 'defaults' does not overwrite existing students
-            student, created = Student.objects.get_or_create(
-                lin=lin,
-                defaults={
-                    'name': record['name'],
-                    'gender': record['gender'],
-                    'stream': record['stream']
-                }
-            )
-            print(f"Student: {student}, Created: {created}")
-
-            # Update existing student details if not created new
-            if not created:
-                student.name = record['name']
-                student.gender = record['gender']
-                student.stream = record['stream']
-                student.save()
-
-            for subject_name, activities in record['subjects_data'].items():
-                print("Processing subject:", subject_name)  # Debugging output
-                subject, created = Subject.objects.get_or_create(name=subject_name)
-                print(f"Subject: {subject}, Created: {created}")
-
-                student_subject, created = StudentSubject.objects.get_or_create(
-                    student=student,
-                    subject=subject,
+                student, created = Student.objects.get_or_create(
+                    lin=lin,
                     defaults={
-                        'c1': activities['c1'],
-                        'c2': activities['c2'],
-                        'c3': activities['c3'],
-                        'fs': activities['c4']
+                        'name': record['name'],
+                        'gender': record['gender'],
+                        'stream': record['stream']
                     }
                 )
-                print(f"StudentSubject: {student_subject}, Created: {created}")
+                logger.debug(f"Student: {student}, Created: {created}")
 
-                # Update existing student_subject details if not created new
                 if not created:
-                    student_subject.c1 = activities['c1']
-                    student_subject.c2 = activities['c2']
-                    student_subject.c3 = activities['c3']
-                    student_subject.fs = activities['c4']
+                    student.name = record['name']
+                    student.gender = record['gender']
+                    student.stream = record['stream']
+                    student.save()
+
+                if 'subjects_data' not in record:
+                    logger.error(f"Missing subjects_data in record: {record}")
+                    continue  # Skip this record and move to the next
+
+                for subject_name, activities in record['subjects_data'].items():
+                    logger.debug("Processing subject:", subject_name)  # Debugging output
+                    subject, created = Subject.objects.get_or_create(name=subject_name)
+                    logger.debug(f"Subject: {subject}, Created: {created}")
+
+                    # Check for non-numeric values in activities
+                    try:
+                        activities_float = {k: float(v) for k, v in activities.items()}
+                    except ValueError as e:
+                        logger.error(f"Non-numeric value in activities for subject {subject_name}: {activities}, Error: {str(e)}")
+                        continue  # Skip this subject and move to the next
+
+                    student_subject, created = StudentSubject.objects.get_or_create(
+                        student=student,
+                        subject=subject,
+                        defaults={
+                            'c1': activities_float.get('c1', 0.0),
+                            'c2': activities_float.get('c2', 0.0),
+                            'c3': activities_float.get('c3', 0.0),
+                            'fs': activities_float.get('c4', 0.0)
+                        }
+                    )
+                    logger.debug(f"StudentSubject: {student_subject}, Created: {created}")
+
+                    # Update existing student_subject details if not created new
+                    if not created:
+                        student_subject.c1 = activities_float.get('c1', 0.0)
+                        student_subject.c2 = activities_float.get('c2', 0.0)
+                        student_subject.c3 = activities_float.get('c3', 0.0)
+                        student_subject.fs = activities_float.get('c4', 0.0)
+                        student_subject.save()
+
+                    # Calculate and update additional fields
+                    student_subject.calculate_avg()
+                    student_subject.twenty_percent = round(student_subject.avg * 0.2,1)
+                    student_subject.eighty_percent = round(student_subject.avg * 0.8,1)
+                    student_subject.final_score = round(student_subject.twenty_percent + student_subject.eighty_percent,1)
+                    student_subject.determine_identifier()
+                    student_subject.achievement = "To be calculated"
+                    student_subject.initials = student.name[:3].upper()  # Example to get first 3 letters of the student's name
                     student_subject.save()
 
-                for idx, activity in enumerate([activities['c1'], activities['c2'], activities['c3'], activities['c4']], start=1):
-                    print(f"Processing activity c{idx}: {activity}")  # Debugging output
-                    mark, created = Marks.objects.get_or_create(
-                        student_subject=student_subject,
-                        component_name=f'c{idx}',
-                        defaults={'marks': activity}
-                    )
-                    print(f"Mark: {mark}, Created: {created}")
+                    for idx, activity in enumerate([activities_float.get('c1', 0.0), activities_float.get('c2', 0.0), activities_float.get('c3', 0.0), activities_float.get('c4', 0.0)], start=1):
+                        logger.debug(f"Processing activity c{idx}: {activity}")  # Debugging output
+                        mark, created = Marks.objects.get_or_create(
+                            student_subject=student_subject,
+                            component_name=f'c{idx}',
+                            defaults={'marks': activity}
+                        )
+                        logger.debug(f"Mark: {mark}, Created: {created}")
 
-                    # Update existing marks details if not created new
-                    if not created:
-                        mark.marks = activity
-                        mark.save()
+                        # Update existing marks details if not created new
+                        if not created:
+                            mark.marks = activity
+                            mark.save()
 
-        except Exception as e:
-            print(f"Error processing record {idx + 1}/{len(combined_records)}: {record}, Error: {str(e)}")  # Debugging output
-            continue  # Skip this record and move to the next
+            except Exception as e:
+                logger.error(f"Error processing record {idx + 1}/{len(combined_records)}: {record}, Error: {str(e)}")  # Debugging output
+                continue  # Skip this record and move to the next
 
-    print("Data successfully written to the database.")
-    print(student_record(request))
-    print("test records: ", get_records())
+    logger.info("Data successfully written to the database.")
     return JsonResponse({'message': 'Data successfully written to the database.'}, status=200)
 
 @csrf_protect
