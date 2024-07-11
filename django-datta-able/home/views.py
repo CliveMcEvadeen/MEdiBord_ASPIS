@@ -1083,9 +1083,11 @@ def write_to_db(request):
 
 @csrf_protect
 def upload_file(request):
+
     """
     uploading the file for excell file
     """
+    
     if request.method == 'POST' and request.FILES.get('file'):
         uploaded_file = request.FILES['file']
         if uploaded_file:

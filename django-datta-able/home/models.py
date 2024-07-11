@@ -188,3 +188,48 @@ class SchoolDetails(models.Model):
 
     def __str__(self):
         return self.school_name
+    
+
+class StudentsDataS1(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    ]
+
+    student_name = models.CharField(max_length=100)
+    lin = models.CharField(max_length=12)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
+    stream = models.CharField(max_length=10)
+    
+class StudentsDataS2(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    ]
+
+    student_name = models.CharField(max_length=100)
+    lin = models.CharField(max_length=12)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
+    stream = models.CharField(max_length=10)
+
+class StudentsDataS3(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    ]
+
+    student_name = models.CharField(max_length=100)
+    lin = models.CharField(max_length=12)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
+    stream = models.CharField(max_length=10)
+
+class StudentsDataS4(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    ]
+
+    student_name = models.CharField(max_length=100)
+    lin = models.CharField(max_length=12)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
+    stream = models.CharField(max_length=10)
