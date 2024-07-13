@@ -1,9 +1,11 @@
+import string
 from django.shortcuts import render, redirect
 from admin_datta.forms import RegistrationForm, LoginForm, UserPasswordChangeForm, UserPasswordResetForm, UserSetPasswordForm
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetConfirmView, PasswordResetView
 from django.views.generic import CreateView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+import openpyxl
 from .models import *
 from turtle import clear
 from django.shortcuts import render,redirect
@@ -37,6 +39,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill,Border,Side
 from django.db import transaction
 import logging
+from openpyxl.styles import PatternFill, Font
+from openpyxl.utils import get_column_letter
 
 logger = logging.getLogger(__name__)
 
@@ -619,76 +623,133 @@ def copy_sheet_to_desktop(request):
 
     # Create a new workbook
     wb = Workbook()
-    ws = wb.active  # Get the active worksheet
 
     # Define title for the sheet
     title = "Student Marks Report"
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=44)  # Merge cells from A1 to AR1
-    title_cell = ws.cell(row=1, column=1)
-    title_cell.value = title
-    title_cell.font = Font(size=14, bold=True)
-    title_cell.alignment = Alignment(horizontal='center', vertical='center')
 
+    # Define header styles
     header_font = Font(bold=True)
     header_align = Alignment(horizontal='center', vertical='center')
-    data_align = Alignment(horizontal='center', vertical='center')
-
-    # Define colors for subjects
-    colors = ['FFC000', '00B0F0']
-
-    # Define headers for student information
-    ws.cell(row=2, column=1).value = "NAME"
-    ws.cell(row=2, column=2).value = "LIN"
-    ws.cell(row=2, column=3).value = "STREAM"
-    ws.cell(row=2, column=4).value = "SEX"
-    for col in range(1, 5):
-        ws.cell(row=2, column=col).alignment = header_align
-        ws.cell(row=2, column=col).font = header_font
-        ws.cell(row=2, column=col).fill = PatternFill(start_color=colors[0], end_color=colors[0], fill_type='solid')
-
-    for i in range(1, 11):
-        subject_name = f"Subject {i}"
-        start_col = 5 + (i - 1) * 4
-        end_col = start_col + 3
-        
-        # Set alternating colors for subjects
-        header_fill = PatternFill(start_color=colors[i % 2], end_color=colors[i % 2], fill_type='solid')
-        
-        # Merge cells for subject name and set styles
-        ws.cell(row=2, column=start_col).value = subject_name
-        ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=end_col)
-        ws.cell(row=2, column=start_col).alignment = header_align
-        ws.cell(row=2, column=start_col).fill = header_fill
-        ws.cell(row=2, column=start_col).font = header_font
-
-        # Set headers for each component of the subject
-        ws.cell(row=3, column=start_col).value = "C1"
-        ws.cell(row=3, column=start_col + 1).value = "C2"
-        ws.cell(row=3, column=start_col + 2).value = "C3"
-        ws.cell(row=3, column=start_col + 3).value = "FS"
-        for col in range(start_col, end_col + 1):
-            ws.cell(row=3, column=col).alignment = header_align
-            ws.cell(row=3, column=col).fill = header_fill
-            ws.cell(row=3, column=col).font = header_font
-
-    # Add borders to all cells in the sheet
+    data_align = Alignment(horizontal='left', vertical='center')
     thin_border = Border(left=Side(style='thin'), 
                          right=Side(style='thin'), 
                          top=Side(style='thin'), 
                          bottom=Side(style='thin'))
-                         
-    for row in ws.iter_rows(min_row=1, max_row=3, min_col=1, max_col=44):
-        for cell in row:
+
+    # Define a dictionary to map models to sheet names
+    model_sheet_mapping = {
+        'SENIOR 1': StudentsDataS1,
+        'SENIOR 2': StudentsDataS2,
+        'SENIOR 3': StudentsDataS3,
+        'SENIOR 4': StudentsDataS4,
+    }
+
+    # Define colors for subjects
+    colors = ['FFC000', '00B0F0']
+
+    # Process each model and create a sheet
+    for sheet_name, model in model_sheet_mapping.items():
+        # Add a new sheet to the workbook
+        ws = wb.create_sheet(title=sheet_name)
+        
+        # Merge cells for title and set styles
+        ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=44)  # Merge cells from A1 to AR1
+        title_cell = ws.cell(row=1, column=1)
+        title_cell.value = title
+        title_cell.font = Font(size=14, bold=True)
+        title_cell.alignment = Alignment(horizontal='center', vertical='center')
+        
+        # Define headers for student information
+        headers = ["STUDENT NAME", "LIN", "GENDER", "STREAM"]
+        for col_num, header in enumerate(headers, 1):
+            cell = ws.cell(row=2, column=col_num, value=header)
+            cell.font = header_font
+            cell.alignment = header_align
+            cell.fill = PatternFill(start_color=colors[0], end_color=colors[0], fill_type='solid')
             cell.border = thin_border
+
+        # Add subject columns
+        for i in range(1, 11):
+            subject_name = f"Subject {i}"
+            start_col = 5 + (i - 1) * 4
+            end_col = start_col + 3
+            
+            # Set alternating colors for subjects
+            header_fill = PatternFill(start_color=colors[i % 2], end_color=colors[i % 2], fill_type='solid')
+            
+            # Merge cells for subject name and set styles
+            ws.cell(row=2, column=start_col).value = subject_name
+            ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=end_col)
+            ws.cell(row=2, column=start_col).alignment = header_align
+            for col in range(start_col, end_col + 1):
+                cell = ws.cell(row=2, column=col)
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.border = thin_border
+
+            # Set headers for each component of the subject
+            ws.cell(row=3, column=start_col).value = "C1"
+            ws.cell(row=3, column=start_col + 1).value = "C2"
+            ws.cell(row=3, column=start_col + 2).value = "C3"
+            ws.cell(row=3, column=start_col + 3).value = "FS"
+
+            for col in range(start_col, end_col + 1):
+                ws.cell(row=3, column=col).alignment = header_align
+                ws.cell(row=3, column=col).fill = header_fill
+                ws.cell(row=3, column=col).font = header_font
+                ws.cell(row=3, column=col).border = thin_border
+
+            # making the corresponding color fill the corresponding columns
+            
+            students = model.objects.all()
+            for row_num in range(4, len(students) + 4):
+                for col in range(start_col, end_col + 1):
+                    ws.cell(row=row_num, column=col).fill = header_fill
+
+        # Query all students in the current model
+        students = model.objects.all()
+        for row_num, student in enumerate(students, 4):
+            ws.cell(row=row_num, column=1, value=student.student_name).alignment = data_align
+            ws.cell(row=row_num, column=2, value=student.lin).alignment = data_align
+            ws.cell(row=row_num, column=3, value=student.gender).alignment = data_align
+            ws.cell(row=row_num, column=4, value=student.stream).alignment = data_align
+            # Placeholder for subjects (C1, C2, C3, FS)
+            for i in range(1, 11):
+                start_col = 5 + (i - 1) * 4
+                for col in range(start_col, start_col + 4):
+                    ws.cell(row=row_num, column=col).alignment = data_align
+
+        # Add borders to all cells in the sheet
+        for row in ws.iter_rows(min_row=2, max_row=len(students) + 3, min_col=1, max_col=44):
+            for cell in row:
+                cell.border = thin_border
+
+        # Freeze the first two columns
+        ws.freeze_panes = 'C2'
+        
+        # Adjust column widths based on content
+        first_col_letter = get_column_letter(1)  # The first column letter is always 'A'
+        max_length = 0
+
+        # Iterate through the first column and calculate the maximum length of the cell values
+        for cell in ws[first_col_letter]:
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+
+        # Adjust the width of the first column
+        adjusted_width = min((max_length + 2), 20)  # Limit width to avoid excessively wide columns
+        ws.column_dimensions[first_col_letter].width = adjusted_width
+
+    # Remove the default sheet created with the workbook if it is empty
+    if "Sheet" in wb.sheetnames:
+        default_sheet = wb["Sheet"]
+        wb.remove(default_sheet)
 
     # Save the workbook as a spreadsheet file
     wb.save(file_path)
     messages.success(request, "Created successfully")
 
     return redirect('index')
-
-    # messages.success(f"Spreadsheet created successfully and saved to desktop")
-
 
 def filter_students(request):
     # if request.method == 'POST':
@@ -747,6 +808,7 @@ def all_fields_filled_checker(request,subject_id, student_id):
 
 # ----------debug-resp-->db-queryset------------------------
     return HttpResponse(all_fields_filled)
+
 
 # ---------------------------graph...................................#
 #
@@ -1136,5 +1198,84 @@ def create_or_update_school_details(request):
 def school_details_success(request):
     return render(request, 'school_details_success.html')
 
-def render_report_data(request):
-    pass
+def create_student_data_workbook(request):
+    try:
+        desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+        folder_path = os.path.join(desktop_path, 'students_data')
+        os.makedirs(folder_path, exist_ok=True)
+        
+        # Generate a random filename
+        random_numbers = ''.join(random.choices(string.digits, k=5))
+        filename = f"students_data_{random_numbers}.xlsx"
+        file_path = os.path.join(folder_path, filename)
+        
+        # Create a new workbook and sheets
+        workbook = openpyxl.Workbook()
+        sheet_names = ["SENIOR 1", "SENIOR 2", "SENIOR 3", "SENIOR 4"]
+        columns = ["STUDENT NAME", "LIN", "PAYMENT CODE", "GENDER", "STREAM"]
+        
+        # Green fill and bold font for the headers
+        header_fill = PatternFill(start_color="00FF00", end_color="00FF00", fill_type="solid")
+        header_font = Font(bold=True)
+        
+        # Rename the default sheet
+        workbook.active.title = sheet_names[0]
+        
+        for sheet_name in sheet_names[1:]:
+            workbook.create_sheet(title=sheet_name)
+        
+        for sheet_name in sheet_names:
+            sheet = workbook[sheet_name]
+            for col_num, column_title in enumerate(columns, 1):
+                cell = sheet.cell(row=1, column=col_num, value=column_title)
+                cell.fill = header_fill
+                cell.font = header_font
+                sheet.column_dimensions[get_column_letter(col_num)].width = 20
+        
+        # Save the workbook
+        workbook.save(file_path)
+        print(f"Workbook successfully created and saved to {file_path}")
+        messages.success(request, "Created successfully")
+    
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
+    return redirect('index')
+
+
+def save_students_data_from_excel(request):
+    try:
+        # Define the path to the Excel file in the uploads folder
+        file_path = os.path.join(settings.BASE_DIR, 'uploads', 'students_data.xlsx')
+
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            return JsonResponse({'error': 'Excel file not found in the uploads folder'}, status=400)
+
+        # Load the Excel file
+        excel_data = pd.ExcelFile(file_path)
+
+        # Define a dictionary to map models to sheet names
+        model_sheet_mapping = {
+            'SENIOR 1': StudentsDataS1,
+            'SENIOR 2': StudentsDataS2,
+            'SENIOR 3': StudentsDataS3,
+            'SENIOR 4': StudentsDataS4,
+        }
+
+        # Process each sheet
+        for sheet_name, model in model_sheet_mapping.items():
+            if sheet_name in excel_data.sheet_names:
+                sheet_data = pd.read_excel(file_path, sheet_name=sheet_name)
+                for index, row in sheet_data.iterrows():
+                    if not model.objects.filter(lin=row['LIN']).exists():
+                        model.objects.create(
+                            student_name=row['STUDENT NAME'],
+                            lin=row['LIN'],
+                            gender=row['GENDER'],
+                            stream=row['STREAM']
+                        )
+
+        return JsonResponse({'message': 'Data successfully saved to the database'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

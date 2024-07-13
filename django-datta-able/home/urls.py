@@ -84,6 +84,8 @@ urlpatterns = [
     path('write-to-db', write_to_db, name='write_to_db'),
     path('school-details/', views.create_or_update_school_details, name='school_details'),
     path('school-details-success/', views.school_details_success, name='school_details_success'),
+    path('save_students_data_from_excel/', views.save_students_data_from_excel, name='save_students_data_from_excel'),
+    path('create_student_data_workbook/', views.create_student_data_workbook, name='create_student_data_workbook'),
     
     # path("__debug__/", include("debug_toolbar.urls")),
 ]

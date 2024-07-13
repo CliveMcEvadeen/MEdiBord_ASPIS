@@ -183,7 +183,7 @@ class SchoolDetails(models.Model):
     school_contact1 = models.CharField(max_length=10)
     school_contact2 = models.CharField(max_length=10)
     school_contact3 = models.CharField(max_length=10, blank=True, null=True)
-    school_box_number = models.CharField(max_length=10)
+    school_box_number = models.CharField(max_length=30)
     school_badge = models.ImageField(upload_to='school_badges/')
 
     def __str__(self):
@@ -197,10 +197,10 @@ class StudentsDataS1(models.Model):
     ]
 
     student_name = models.CharField(max_length=100)
-    lin = models.CharField(max_length=12)
+    lin = models.CharField(max_length=12, unique=True)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
     stream = models.CharField(max_length=10)
-    
+
 class StudentsDataS2(models.Model):
     GENDER_CHOICES = [
         ('Male', 'Male'),
@@ -208,7 +208,7 @@ class StudentsDataS2(models.Model):
     ]
 
     student_name = models.CharField(max_length=100)
-    lin = models.CharField(max_length=12)
+    lin = models.CharField(max_length=12, unique=True)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
     stream = models.CharField(max_length=10)
 
@@ -219,7 +219,7 @@ class StudentsDataS3(models.Model):
     ]
 
     student_name = models.CharField(max_length=100)
-    lin = models.CharField(max_length=12)
+    lin = models.CharField(max_length=12, unique=True)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
     stream = models.CharField(max_length=10)
 
@@ -230,6 +230,6 @@ class StudentsDataS4(models.Model):
     ]
 
     student_name = models.CharField(max_length=100)
-    lin = models.CharField(max_length=12)
+    lin = models.CharField(max_length=12, unique=True)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
     stream = models.CharField(max_length=10)
